@@ -14,7 +14,7 @@ const App: React.FC = () => {
   // No need for a separate variable
 
   return (
-    <BrowserRouter basename="/book-database">
+    <BrowserRouter basename="/book_database">
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />

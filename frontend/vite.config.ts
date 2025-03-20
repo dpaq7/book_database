@@ -17,5 +17,5 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
   },
-  base: '/book-database/' // For GitHub Pages deployment
+  base: '/book_database/' // Updated for GitHub Pages deployment with underscore
 });
