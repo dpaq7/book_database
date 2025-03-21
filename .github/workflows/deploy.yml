@@ -9,6 +9,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: write  # Added explicit permission for artifacts
 
 jobs:
   build:
@@ -47,11 +48,36 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v3
         
-      - name: Upload Pages artifact
+      # Verify path exists before upload
+      - name: Verify artifact path
         run: |
-          # This is a workaround for the artifact upload issue
-          cd ./frontend/dist
-          npx -y @actions/artifact upload --name "github-pages" --compression-level 9 .
+          echo "Verifying dist directory contents:"
+          ls -la frontend/dist/
+          echo "Disk space information:"
+          df -h
+        
+      # Use specific version of upload-artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: github-pages
+          path: ./frontend/dist
+          retention-days: 1
+          
+      # Create and upload a test file as fallback
+      - name: Create test artifact (fallback)
+        if: failure()
+        run: |
+          echo "Creating test artifact"
+          mkdir -p fallback-artifact
+          echo "<html><body><h1>Book Database - Under Maintenance</h1><p>The site is currently being updated. Please check back later.</p></body></html>" > fallback-artifact/index.html
+          
+      - name: Upload test artifact (fallback)
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: github-pages
+          path: ./fallback-artifact
           
   deploy:
     environment:
