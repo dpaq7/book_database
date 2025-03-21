@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
-  actions: write  # Added explicit permission for artifacts
 
 jobs:
-  build:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,47 +45,9 @@ jobs:
           ls -la dist/
         working-directory: ./frontend
         
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-        
-      # Verify path exists before upload
-      - name: Verify artifact path
-        run: |
-          echo "Verifying dist directory contents:"
-          ls -la frontend/dist/
-          echo "Disk space information:"
-          df -h
-        
-      # Use specific version of upload-artifact
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: github-pages
-          path: ./frontend/dist
-          retention-days: 1
-          
-      # Create and upload a test file as fallback
-      - name: Create test artifact (fallback)
-        if: failure()
-        run: |
-          echo "Creating test artifact"
-          mkdir -p fallback-artifact
-          echo "<html><body><h1>Book Database - Under Maintenance</h1><p>The site is currently being updated. Please check back later.</p></body></html>" > fallback-artifact/index.html
-          
-      - name: Upload test artifact (fallback)
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: github-pages
-          path: ./fallback-artifact
-          
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: frontend/dist
+          branch: gh-pages
+          clean: true
