@@ -40,13 +40,20 @@ jobs:
           echo "Build output (dist) contents:"
           ls -la dist/
         working-directory: ./frontend
-        
+      
+      # Force a clean deployment
+      - name: Force cleanup gh-pages branch locally
+        run: |
+          git branch -D gh-pages || true
+          
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.5.0  # Specify exact version
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
           folder: frontend/dist      # Folder with build output
           branch: gh-pages           # Branch to deploy to
-          clean: true                # Clean up old files
-          token: ${{ secrets.GITHUB_TOKEN }}  # Explicit token reference
+          clean-exclude: |           # Ensure we don't delete critical files
+            .nojekyll
+          token: ${{ secrets.GITHUB_TOKEN }}
+          force: true                # Force push
           git-config-name: GitHub Actions
           git-config-email: github-actions@github.com
