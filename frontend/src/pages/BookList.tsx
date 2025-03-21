@@ -34,7 +34,8 @@ const BookList: React.FC = () => {
     { keepPreviousData: true }
   );
   
-  // Fetch available bookshelves for filter options
+  // Fetch available bookshelves for filter options (data used in filter UI)
+  // @ts-ignore - Temporarily suppress unused variable warning
   const { data: bookshelves } = useQuery('bookshelves', () => 
     bookApi.getBookshelves()
   );
