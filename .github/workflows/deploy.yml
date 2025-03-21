@@ -47,10 +47,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v3
         
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './frontend/dist'
+      - name: Upload Pages artifact
+        run: |
+          # This is a workaround for the artifact upload issue
+          cd ./frontend/dist
+          npx -y @actions/artifact upload --name "github-pages" --compression-level 9 .
           
   deploy:
     environment:
